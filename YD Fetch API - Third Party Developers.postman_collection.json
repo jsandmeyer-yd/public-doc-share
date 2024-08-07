@@ -1,0 +1,2436 @@
+{
+	"info": {
+		"_postman_id": "c40abaea-ab05-4f18-874b-9da16c71e122",
+		"name": "YD Fetch API - Third Party Developers",
+		"description": "The purpose of this Postman collection is to provide a few examples of endpoints. For the most up to date models or for using code-gen for representing the models used by this api in your code language of choice use the [Download OpenAPI specification link](https://fetch.yellowdogsoftware.com/swagger/v3/swagger.json) on the official [Documentation Site](https://fetch.yellowdogsoftware.com/index.html).\n\n# Authentication\n\nAuthentication is handled by receiving a token from the Yellow Dog Auth API. All requests require an Authorization header with a Bearer token included. The only source for this Token is through the Yellow Dog Auth API.\n\nAs an integrator you should have received an API Client ID as well as a username and password for a Yellow Dog Inventory Database Instance.\n\nAn example of this token flow is available in the Pre-request Script that is associated with this Postman collection that is written in JavaScript.\n\n# Versioning\n\nCurrently Fetch API has two versions available, v2 and v3. The latest version (currently v3) is the preferred version as it properly supports utc based time which we have found is more reliable for integrations that consume our api for integration.\n\nIn more technical terms, the difference between v2 and v3 is that v2 the dates are considered local time in DateTime (2024-02-01T06:05:58.378), while v3 dates are DateTimeOffset (2024-02-01T06:05:58.3789726-05:00) to allow for UTC time based comparison.\n\n## Example of data field changes between v2 and v3\n\nThe following example objects highlight the expected changes between v2 and v3 API versions. The requests used here represent the same Client ID and User name for the token, so the source data can be considered the same.\n\n### Example v2\n\n``` bash\ncurl --location 'https://fetch.yellowdogsoftware.com/api/v2/items?orderBy=sku&filter=lastUpdated>=20240118'\n\n ```\n\nResponse body\n\n``` json\n[\n  {\n    \"id\": \"8f51224d-f36b-1410-82e8-00371620ba36\",\n    \"description\": \"DELETE_ME_LATER_PLS: 71931-13092\",\n    \"sku\": \"24662FAKESKU27259\",\n    \"lastUpdated\": \"2024-02-01T06:05:58.378Z\",\n    ...(other fields removed for brevity)\n  }\n]\n\n ```\n\n### Example v3\n\n``` bash\ncurl --location 'https://fetch.yellowdogsoftware.com/api/v3/items?orderBy=sku&filter=lastUpdated>=20240118'\n\n ```\n\nResponse body\n\n``` json\n[\n  {\n    \"id\": \"8f51224d-f36b-1410-82e8-00371620ba36\",\n    \"description\": \"DELETE_ME_LATER_PLS: 71931-13092\",\n    \"sku\": \"24662FAKESKU27259\",\n    \"lastUpdated\": \"2024-02-01T06:05:58.3789726-05:00\",\n    ...(other fields removed for brevity)\n  }\n]\n\n ```\n\n### Highlight of difference\n\nV2 lastUpdated field reflects the local time value with Z at the end: `2024-02-01T06:05:58.378Z`\n\nV3 lastUpdated field reflects the full ISO 8601 representation as Date and time with the offset: `2024-02-01T06:05:58.3789726-05:00`\n\n# Recommended Header Values\n\n| **Key** | **Value** |\n| --- | --- |\n| User-Agent | {Value identifying your application sync name} |\n| Accept-Encoding | gzip |\n\nAs most of the data retrieved from this api is able usually able to be compressed we recommend enabling the following header values.\n\n# Rate Limiting\n\nFetch API uses a request-based limiting system per user. This means there is a maximum number of total requests a user can make to Fetch API within a range of time. The current rate limit for requests is 2 requests per second.\n\nWhen the request rate exceeds the maximum number of requests per second, requests made will result in a response code of 429 (Too Many Requests). This response will be given until requests are able to be processed within the request rate limit. It is recommended that if you encounter a 429 response code to set a timer locally to have your application sleep for the number of seconds sent back from the Retry-After Response header.\n\nWe highly recommend that consumers of our api use it for only updating their own datastore. Using this api to service page loads and realtime display directly will rapidly exceed the usage limits.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "37530341"
+	},
+	"item": [
+		{
+			"name": "Accounting",
+			"item": [
+				{
+					"name": "Get Invoices",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/api/v3/accounting/{{storeId}}/{{date}}/invoices",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"v3",
+								"accounting",
+								"{{storeId}}",
+								"{{date}}",
+								"invoices"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Return To Vendors",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/api/v3/accounting/{{storeId}}/{{date}}/returnToVendors",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"v3",
+								"accounting",
+								"{{storeId}}",
+								"{{date}}",
+								"returnToVendors"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get  Journal Entries",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{apiUrl}}/api/v3/accounting/{{storeId}}/{{date}}/journalEntry?types=PhysicalInventory&types=ManualAdjustment&types=CostOfGoodsSold&types=Transfer&types=Receipt",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"v3",
+								"accounting",
+								"{{storeId}}",
+								"{{date}}",
+								"journalEntry"
+							],
+							"query": [
+								{
+									"key": "types",
+									"value": "PhysicalInventory"
+								},
+								{
+									"key": "types",
+									"value": "ManualAdjustment"
+								},
+								{
+									"key": "types",
+									"value": "CostOfGoodsSold"
+								},
+								{
+									"key": "types",
+									"value": "Transfer"
+								},
+								{
+									"key": "types",
+									"value": "Receipt"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Revenue",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{apiUrl}}/api/v3/accounting/{{storeId}}/{{date}}/revenue?types=Sale&types=Tax&types=Tender",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"v3",
+								"accounting",
+								"{{storeId}}",
+								"{{date}}",
+								"revenue"
+							],
+							"query": [
+								{
+									"key": "types",
+									"value": "Sale"
+								},
+								{
+									"key": "types",
+									"value": "Tax"
+								},
+								{
+									"key": "types",
+									"value": "Tender"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Count Sheets",
+			"item": [
+				{
+					"name": "Get All",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{apiUrl}}/api/v3/countsheets?pageNumber=1&pageSize=100",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"v3",
+								"countsheets"
+							],
+							"query": [
+								{
+									"key": "pageNumber",
+									"value": "1"
+								},
+								{
+									"key": "pageSize",
+									"value": "100"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "MetaInfo Response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{Token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/api/v3/metainfo",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"api",
+										"v3",
+										"metainfo"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8",
+									"name": "Content-Type",
+									"description": ""
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 23 Aug 2017 16:53:14 GMT",
+									"name": "Date",
+									"description": ""
+								},
+								{
+									"key": "Server",
+									"value": "Kestrel",
+									"name": "Server",
+									"description": ""
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked",
+									"name": "Transfer-Encoding",
+									"description": ""
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "ASP.NET",
+									"name": "X-Powered-By",
+									"description": ""
+								},
+								{
+									"key": "X-SourceFiles",
+									"value": "=?UTF-8?B?RTpcR0lUXGFwaVxhcGlcYXBpXHYyXG1ldGFpbmZv?=",
+									"name": "X-SourceFiles",
+									"description": ""
+								}
+							],
+							"cookie": [],
+							"body": "{\"dimensions\":[\"Size\",\"Color\",\"Season\",\"Material\",\"Dim 5\",\"Dim 6\",\"Dimension7\",\"Dimension8\",\"Dimension9\",\"Dimension10\"],\"genericInterfacesCodes\":[\"GenericCodeA\",\"GenericCodeB\",\"GenericCodeC\",\"GenericCodeD\",\"GenericCodeE\",\"GenericCodeF\",\"GenericCodeG\"],\"genericInterfacesLevels\":[\"GenericLevelA\",\"GenericLevelB\",\"GenericLevelC\"],\"levels\":[\"Department\",\"Sub-Deptartment\",\"Category\",\"Sub-Category\"],\"webItemFlags\":[\"New Item\",\"Last Chance\",\"Taxable\"],\"store\":\"&Store\",\"manufacturer\":\"&Manufacturer\",\"vendor\":\"&Vendor\",\"flag\":\"Location\"}"
+						}
+					]
+				},
+				{
+					"name": "Get By Id",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{apiUrl}}/api/v3/countsheets/{{id}}",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"v3",
+								"countsheets",
+								"{{id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Currency",
+			"item": [
+				{
+					"name": "Get All",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{apiUrl}}/api/v3/currency?pageNumber=1&pageSize=100&orderBy=date",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"v3",
+								"currency"
+							],
+							"query": [
+								{
+									"key": "pageNumber",
+									"value": "1"
+								},
+								{
+									"key": "pageSize",
+									"value": "100"
+								},
+								{
+									"key": "orderBy",
+									"value": "date",
+									"description": "[currencyCode, date, lastUpdated]"
+								},
+								{
+									"key": "filter",
+									"value": "date>",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "MetaInfo Response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{Token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/api/v3/metainfo",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"api",
+										"v3",
+										"metainfo"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8",
+									"name": "Content-Type",
+									"description": ""
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 23 Aug 2017 16:53:14 GMT",
+									"name": "Date",
+									"description": ""
+								},
+								{
+									"key": "Server",
+									"value": "Kestrel",
+									"name": "Server",
+									"description": ""
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked",
+									"name": "Transfer-Encoding",
+									"description": ""
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "ASP.NET",
+									"name": "X-Powered-By",
+									"description": ""
+								},
+								{
+									"key": "X-SourceFiles",
+									"value": "=?UTF-8?B?RTpcR0lUXGFwaVxhcGlcYXBpXHYyXG1ldGFpbmZv?=",
+									"name": "X-SourceFiles",
+									"description": ""
+								}
+							],
+							"cookie": [],
+							"body": "{\"dimensions\":[\"Size\",\"Color\",\"Season\",\"Material\",\"Dim 5\",\"Dim 6\",\"Dimension7\",\"Dimension8\",\"Dimension9\",\"Dimension10\"],\"genericInterfacesCodes\":[\"GenericCodeA\",\"GenericCodeB\",\"GenericCodeC\",\"GenericCodeD\",\"GenericCodeE\",\"GenericCodeF\",\"GenericCodeG\"],\"genericInterfacesLevels\":[\"GenericLevelA\",\"GenericLevelB\",\"GenericLevelC\"],\"levels\":[\"Department\",\"Sub-Deptartment\",\"Category\",\"Sub-Category\"],\"webItemFlags\":[\"New Item\",\"Last Chance\",\"Taxable\"],\"store\":\"&Store\",\"manufacturer\":\"&Manufacturer\",\"vendor\":\"&Vendor\",\"flag\":\"Location\"}"
+						}
+					]
+				},
+				{
+					"name": "Get By Id",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{apiUrl}}/api/v3/currency/{{id}}",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"v3",
+								"currency",
+								"{{id}}"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "MetaInfo Response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{Token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/api/v3/metainfo",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"api",
+										"v3",
+										"metainfo"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8",
+									"name": "Content-Type",
+									"description": ""
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 23 Aug 2017 16:53:14 GMT",
+									"name": "Date",
+									"description": ""
+								},
+								{
+									"key": "Server",
+									"value": "Kestrel",
+									"name": "Server",
+									"description": ""
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked",
+									"name": "Transfer-Encoding",
+									"description": ""
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "ASP.NET",
+									"name": "X-Powered-By",
+									"description": ""
+								},
+								{
+									"key": "X-SourceFiles",
+									"value": "=?UTF-8?B?RTpcR0lUXGFwaVxhcGlcYXBpXHYyXG1ldGFpbmZv?=",
+									"name": "X-SourceFiles",
+									"description": ""
+								}
+							],
+							"cookie": [],
+							"body": "{\"dimensions\":[\"Size\",\"Color\",\"Season\",\"Material\",\"Dim 5\",\"Dim 6\",\"Dimension7\",\"Dimension8\",\"Dimension9\",\"Dimension10\"],\"genericInterfacesCodes\":[\"GenericCodeA\",\"GenericCodeB\",\"GenericCodeC\",\"GenericCodeD\",\"GenericCodeE\",\"GenericCodeF\",\"GenericCodeG\"],\"genericInterfacesLevels\":[\"GenericLevelA\",\"GenericLevelB\",\"GenericLevelC\"],\"levels\":[\"Department\",\"Sub-Deptartment\",\"Category\",\"Sub-Category\"],\"webItemFlags\":[\"New Item\",\"Last Chance\",\"Taxable\"],\"store\":\"&Store\",\"manufacturer\":\"&Manufacturer\",\"vendor\":\"&Vendor\",\"flag\":\"Location\"}"
+						}
+					]
+				},
+				{
+					"name": "Get Effective Exchange Rate",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{apiUrl}}/api/v3/currency/effectiveExchangeRate/{{currencyCode}}",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"v3",
+								"currency",
+								"effectiveExchangeRate",
+								"{{currencyCode}}"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "MetaInfo Response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{Token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/api/v3/metainfo",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"api",
+										"v3",
+										"metainfo"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8",
+									"name": "Content-Type",
+									"description": ""
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 23 Aug 2017 16:53:14 GMT",
+									"name": "Date",
+									"description": ""
+								},
+								{
+									"key": "Server",
+									"value": "Kestrel",
+									"name": "Server",
+									"description": ""
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked",
+									"name": "Transfer-Encoding",
+									"description": ""
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "ASP.NET",
+									"name": "X-Powered-By",
+									"description": ""
+								},
+								{
+									"key": "X-SourceFiles",
+									"value": "=?UTF-8?B?RTpcR0lUXGFwaVxhcGlcYXBpXHYyXG1ldGFpbmZv?=",
+									"name": "X-SourceFiles",
+									"description": ""
+								}
+							],
+							"cookie": [],
+							"body": "{\"dimensions\":[\"Size\",\"Color\",\"Season\",\"Material\",\"Dim 5\",\"Dim 6\",\"Dimension7\",\"Dimension8\",\"Dimension9\",\"Dimension10\"],\"genericInterfacesCodes\":[\"GenericCodeA\",\"GenericCodeB\",\"GenericCodeC\",\"GenericCodeD\",\"GenericCodeE\",\"GenericCodeF\",\"GenericCodeG\"],\"genericInterfacesLevels\":[\"GenericLevelA\",\"GenericLevelB\",\"GenericLevelC\"],\"levels\":[\"Department\",\"Sub-Deptartment\",\"Category\",\"Sub-Category\"],\"webItemFlags\":[\"New Item\",\"Last Chance\",\"Taxable\"],\"store\":\"&Store\",\"manufacturer\":\"&Manufacturer\",\"vendor\":\"&Vendor\",\"flag\":\"Location\"}"
+						}
+					]
+				},
+				{
+					"name": "Create Bulk",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "\n[\n  {\n    \"currencyCode\": \"string\",\n    \"date\": \"2019-02-27T17:49:19.865Z\",\n    \"exchangeRate\": 0\n  }\n]"
+						},
+						"url": {
+							"raw": "{{apiUrl}}/api/v3/currency",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"v3",
+								"currency"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "MetaInfo Response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{Token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/api/v3/metainfo",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"api",
+										"v3",
+										"metainfo"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8",
+									"name": "Content-Type",
+									"description": ""
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 23 Aug 2017 16:53:14 GMT",
+									"name": "Date",
+									"description": ""
+								},
+								{
+									"key": "Server",
+									"value": "Kestrel",
+									"name": "Server",
+									"description": ""
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked",
+									"name": "Transfer-Encoding",
+									"description": ""
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "ASP.NET",
+									"name": "X-Powered-By",
+									"description": ""
+								},
+								{
+									"key": "X-SourceFiles",
+									"value": "=?UTF-8?B?RTpcR0lUXGFwaVxhcGlcYXBpXHYyXG1ldGFpbmZv?=",
+									"name": "X-SourceFiles",
+									"description": ""
+								}
+							],
+							"cookie": [],
+							"body": "{\"dimensions\":[\"Size\",\"Color\",\"Season\",\"Material\",\"Dim 5\",\"Dim 6\",\"Dimension7\",\"Dimension8\",\"Dimension9\",\"Dimension10\"],\"genericInterfacesCodes\":[\"GenericCodeA\",\"GenericCodeB\",\"GenericCodeC\",\"GenericCodeD\",\"GenericCodeE\",\"GenericCodeF\",\"GenericCodeG\"],\"genericInterfacesLevels\":[\"GenericLevelA\",\"GenericLevelB\",\"GenericLevelC\"],\"levels\":[\"Department\",\"Sub-Deptartment\",\"Category\",\"Sub-Category\"],\"webItemFlags\":[\"New Item\",\"Last Chance\",\"Taxable\"],\"store\":\"&Store\",\"manufacturer\":\"&Manufacturer\",\"vendor\":\"&Vendor\",\"flag\":\"Location\"}"
+						}
+					]
+				},
+				{
+					"name": "Update Bulk",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n  {\n    \"id\": \"string\",\n    \"currencyCode\": \"string\",\n    \"date\": \"2019-02-27T17:49:33.448Z\",\n    \"exchangeRate\": 0\n  }\n]"
+						},
+						"url": {
+							"raw": "{{apiUrl}}/api/v3/currency",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"v3",
+								"currency"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "MetaInfo Response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{Token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/api/v3/metainfo",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"api",
+										"v3",
+										"metainfo"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8",
+									"name": "Content-Type",
+									"description": ""
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 23 Aug 2017 16:53:14 GMT",
+									"name": "Date",
+									"description": ""
+								},
+								{
+									"key": "Server",
+									"value": "Kestrel",
+									"name": "Server",
+									"description": ""
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked",
+									"name": "Transfer-Encoding",
+									"description": ""
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "ASP.NET",
+									"name": "X-Powered-By",
+									"description": ""
+								},
+								{
+									"key": "X-SourceFiles",
+									"value": "=?UTF-8?B?RTpcR0lUXGFwaVxhcGlcYXBpXHYyXG1ldGFpbmZv?=",
+									"name": "X-SourceFiles",
+									"description": ""
+								}
+							],
+							"cookie": [],
+							"body": "{\"dimensions\":[\"Size\",\"Color\",\"Season\",\"Material\",\"Dim 5\",\"Dim 6\",\"Dimension7\",\"Dimension8\",\"Dimension9\",\"Dimension10\"],\"genericInterfacesCodes\":[\"GenericCodeA\",\"GenericCodeB\",\"GenericCodeC\",\"GenericCodeD\",\"GenericCodeE\",\"GenericCodeF\",\"GenericCodeG\"],\"genericInterfacesLevels\":[\"GenericLevelA\",\"GenericLevelB\",\"GenericLevelC\"],\"levels\":[\"Department\",\"Sub-Deptartment\",\"Category\",\"Sub-Category\"],\"webItemFlags\":[\"New Item\",\"Last Chance\",\"Taxable\"],\"store\":\"&Store\",\"manufacturer\":\"&Manufacturer\",\"vendor\":\"&Vendor\",\"flag\":\"Location\"}"
+						}
+					]
+				},
+				{
+					"name": "Delete Bulk",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "\n[\n  \"81b71362-4d30-4ecc-ac19-cc467d52ce4e\"\n]\n"
+						},
+						"url": {
+							"raw": "{{apiUrl}}/api/v3/currency",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"v3",
+								"currency"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "MetaInfo Response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{Token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/api/v3/metainfo",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"api",
+										"v3",
+										"metainfo"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8",
+									"name": "Content-Type",
+									"description": ""
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 23 Aug 2017 16:53:14 GMT",
+									"name": "Date",
+									"description": ""
+								},
+								{
+									"key": "Server",
+									"value": "Kestrel",
+									"name": "Server",
+									"description": ""
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked",
+									"name": "Transfer-Encoding",
+									"description": ""
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "ASP.NET",
+									"name": "X-Powered-By",
+									"description": ""
+								},
+								{
+									"key": "X-SourceFiles",
+									"value": "=?UTF-8?B?RTpcR0lUXGFwaVxhcGlcYXBpXHYyXG1ldGFpbmZv?=",
+									"name": "X-SourceFiles",
+									"description": ""
+								}
+							],
+							"cookie": [],
+							"body": "{\"dimensions\":[\"Size\",\"Color\",\"Season\",\"Material\",\"Dim 5\",\"Dim 6\",\"Dimension7\",\"Dimension8\",\"Dimension9\",\"Dimension10\"],\"genericInterfacesCodes\":[\"GenericCodeA\",\"GenericCodeB\",\"GenericCodeC\",\"GenericCodeD\",\"GenericCodeE\",\"GenericCodeF\",\"GenericCodeG\"],\"genericInterfacesLevels\":[\"GenericLevelA\",\"GenericLevelB\",\"GenericLevelC\"],\"levels\":[\"Department\",\"Sub-Deptartment\",\"Category\",\"Sub-Category\"],\"webItemFlags\":[\"New Item\",\"Last Chance\",\"Taxable\"],\"store\":\"&Store\",\"manufacturer\":\"&Manufacturer\",\"vendor\":\"&Vendor\",\"flag\":\"Location\"}"
+						}
+					]
+				},
+				{
+					"name": "Delete By Id",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{apiUrl}}/api/v3/currency/{{id}}",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"v3",
+								"currency",
+								"{{id}}"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "MetaInfo Response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{Token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/api/v3/metainfo",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"api",
+										"v3",
+										"metainfo"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8",
+									"name": "Content-Type",
+									"description": ""
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 23 Aug 2017 16:53:14 GMT",
+									"name": "Date",
+									"description": ""
+								},
+								{
+									"key": "Server",
+									"value": "Kestrel",
+									"name": "Server",
+									"description": ""
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked",
+									"name": "Transfer-Encoding",
+									"description": ""
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "ASP.NET",
+									"name": "X-Powered-By",
+									"description": ""
+								},
+								{
+									"key": "X-SourceFiles",
+									"value": "=?UTF-8?B?RTpcR0lUXGFwaVxhcGlcYXBpXHYyXG1ldGFpbmZv?=",
+									"name": "X-SourceFiles",
+									"description": ""
+								}
+							],
+							"cookie": [],
+							"body": "{\"dimensions\":[\"Size\",\"Color\",\"Season\",\"Material\",\"Dim 5\",\"Dim 6\",\"Dimension7\",\"Dimension8\",\"Dimension9\",\"Dimension10\"],\"genericInterfacesCodes\":[\"GenericCodeA\",\"GenericCodeB\",\"GenericCodeC\",\"GenericCodeD\",\"GenericCodeE\",\"GenericCodeF\",\"GenericCodeG\"],\"genericInterfacesLevels\":[\"GenericLevelA\",\"GenericLevelB\",\"GenericLevelC\"],\"levels\":[\"Department\",\"Sub-Deptartment\",\"Category\",\"Sub-Category\"],\"webItemFlags\":[\"New Item\",\"Last Chance\",\"Taxable\"],\"store\":\"&Store\",\"manufacturer\":\"&Manufacturer\",\"vendor\":\"&Vendor\",\"flag\":\"Location\"}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Dimensions",
+			"item": [
+				{
+					"name": "Get All",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{apiUrl}}/api/v3/dimensions?pageNumber=1&pageSize=100",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"v3",
+								"dimensions"
+							],
+							"query": [
+								{
+									"key": "pageNumber",
+									"value": "1"
+								},
+								{
+									"key": "pageSize",
+									"value": "100"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get By Id",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{apiUrl}}/api/v3/dimensions/{{id}}",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"v3",
+								"dimensions",
+								"{{id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Bulk",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n  {\n    \"type\": \"string\",\n    \"description\": \"string\",\n    \"id\": \"string\"\n  }\n]"
+						},
+						"url": {
+							"raw": "{{apiUrl}}/api/v3/dimensions",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"v3",
+								"dimensions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Bulk",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n  {\n    \"type\": \"string\",\n    \"description\": \"string\",\n    \"id\": \"string\"\n  }\n]"
+						},
+						"url": {
+							"raw": "{{apiUrl}}/api/v3/dimensions",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"v3",
+								"dimensions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete By Id",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{apiUrl}}/api/v3/dimensions/{{id}}",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"v3",
+								"dimensions",
+								"{{id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Flags",
+			"item": [
+				{
+					"name": "Get All",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/api/v3/flags?pageNumber=1&pageSize=100",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"v3",
+								"flags"
+							],
+							"query": [
+								{
+									"key": "pageNumber",
+									"value": "1"
+								},
+								{
+									"key": "pageSize",
+									"value": "100"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get By Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/api/v3/flags/{{id}}",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"v3",
+								"flags",
+								"{{id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Items",
+			"item": [
+				{
+					"name": "Get All",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/api/v3/items?Expand=Stores&Expand=Vendors&orderBy=sku&filter=lastUpdated>=20190101",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"v3",
+								"items"
+							],
+							"query": [
+								{
+									"key": "Expand",
+									"value": "Stores"
+								},
+								{
+									"key": "Expand",
+									"value": "Vendors"
+								},
+								{
+									"key": "orderBy",
+									"value": "sku",
+									"description": "[sku,description,itemId]"
+								},
+								{
+									"key": "filter",
+									"value": "lastUpdated>=20190101"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get By Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/api/v3/items/{{id}}?Expand=Stores&Expand=Vendors",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"v3",
+								"items",
+								"{{id}}"
+							],
+							"query": [
+								{
+									"key": "Expand",
+									"value": "Stores"
+								},
+								{
+									"key": "Expand",
+									"value": "Vendors"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Manual Adjusts",
+			"item": [
+				{
+					"name": "Create Bulk",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"name": "Content-Type",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n  {\n    \"itemID\": \"string\",\n    \"storeID\": \"string\",\n    \"beanAccountID\": \"string\",\n    \"newOnHand\": 0,\n    \"adjustment\": 0,\n    \"itemCost\": 0,\n    \"reference\": \"string\"\n  }\n]"
+						},
+						"url": {
+							"raw": "{{apiUrl}}/api/v3/manualadjusts",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"v3",
+								"manualadjusts"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "MetaInfo",
+			"item": [
+				{
+					"name": "MetaInfo",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{apiUrl}}/api/v3/metainfo",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"v3",
+								"metainfo"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "MetaInfo Response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{Token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{URL}}/api/v3/metainfo",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"api",
+										"v3",
+										"metainfo"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8",
+									"name": "Content-Type",
+									"description": ""
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 23 Aug 2017 16:53:14 GMT",
+									"name": "Date",
+									"description": ""
+								},
+								{
+									"key": "Server",
+									"value": "Kestrel",
+									"name": "Server",
+									"description": ""
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked",
+									"name": "Transfer-Encoding",
+									"description": ""
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "ASP.NET",
+									"name": "X-Powered-By",
+									"description": ""
+								},
+								{
+									"key": "X-SourceFiles",
+									"value": "=?UTF-8?B?RTpcR0lUXGFwaVxhcGlcYXBpXHYyXG1ldGFpbmZv?=",
+									"name": "X-SourceFiles",
+									"description": ""
+								}
+							],
+							"cookie": [],
+							"body": "{\"dimensions\":[\"Size\",\"Color\",\"Season\",\"Material\",\"Dim 5\",\"Dim 6\",\"Dimension7\",\"Dimension8\",\"Dimension9\",\"Dimension10\"],\"genericInterfacesCodes\":[\"GenericCodeA\",\"GenericCodeB\",\"GenericCodeC\",\"GenericCodeD\",\"GenericCodeE\",\"GenericCodeF\",\"GenericCodeG\"],\"genericInterfacesLevels\":[\"GenericLevelA\",\"GenericLevelB\",\"GenericLevelC\"],\"levels\":[\"Department\",\"Sub-Deptartment\",\"Category\",\"Sub-Category\"],\"webItemFlags\":[\"New Item\",\"Last Chance\",\"Taxable\"],\"store\":\"&Store\",\"manufacturer\":\"&Manufacturer\",\"vendor\":\"&Vendor\",\"flag\":\"Location\"}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Purchasing",
+			"item": [
+				{
+					"name": "Purchase Orders",
+					"item": [
+						{
+							"name": "Get All",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{apiUrl}}/api/v3/purchaseOrders?pageNumber=1&pageSize=100&Filter=commit=true&orderBy=docNumber&Expand= items&Expand= stores&Expand= users&Expand= vendors&Expand= lineDetails&Expand= approvalStatuses",
+									"host": [
+										"{{apiUrl}}"
+									],
+									"path": [
+										"api",
+										"v3",
+										"purchaseOrders"
+									],
+									"query": [
+										{
+											"key": "pageNumber",
+											"value": "1"
+										},
+										{
+											"key": "pageSize",
+											"value": "100"
+										},
+										{
+											"key": "Filter",
+											"value": "commit=true"
+										},
+										{
+											"key": "orderBy",
+											"value": "docNumber",
+											"description": "[committed,docNumber,lastUpdated]"
+										},
+										{
+											"key": "Expand",
+											"value": " items"
+										},
+										{
+											"key": "Expand",
+											"value": " stores"
+										},
+										{
+											"key": "Expand",
+											"value": " users"
+										},
+										{
+											"key": "Expand",
+											"value": " vendors"
+										},
+										{
+											"key": "Expand",
+											"value": " lineDetails"
+										},
+										{
+											"key": "Expand",
+											"value": " approvalStatuses"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get By Id",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{apiUrl}}/api/v3/PurchaseOrders?Expand= items&Expand= stores&Expand= users&Expand= vendors&Expand= lineDetails&Expand= approvalStatuses",
+									"host": [
+										"{{apiUrl}}"
+									],
+									"path": [
+										"api",
+										"v3",
+										"PurchaseOrders"
+									],
+									"query": [
+										{
+											"key": "Expand",
+											"value": " items"
+										},
+										{
+											"key": "Expand",
+											"value": " stores"
+										},
+										{
+											"key": "Expand",
+											"value": " users"
+										},
+										{
+											"key": "Expand",
+											"value": " vendors"
+										},
+										{
+											"key": "Expand",
+											"value": " lineDetails"
+										},
+										{
+											"key": "Expand",
+											"value": " approvalStatuses"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Bulk",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "[\n  {\n    \"thirdPartyID\": \"string\",\n    \"docNumber\": \"string\",\n    \"totalAmount\": 0,\n    \"lines\": [\n      {\n        \"commdocID\": \"string\",\n        \"commdocLineID\": \"string\",\n        \"thirdPartyLineID\": \"string\",\n        \"lineNumber\": 0,\n        \"vendorPrice\": 0,\n        \"quantity\": 0,\n        \"notes\": \"string\",\n        \"backLinkLineID\": \"string\",\n        \"item\": {\n          \"id\": \"string\"\n        }\n      }\n    ],\n    \"startShip\": \"2019-02-27T19:16:43.289Z\",\n    \"cancelShip\": \"2019-02-27T19:16:43.289Z\",\n    \"reference\": \"string\",\n    \"description\": \"string\",\n    \"instructions\": \"string\",\n    \"notes\": \"string\",\n    \"backOrdered\": true,\n    \"canceled\": true,\n    \"invoicedEDI\": true,\n    \"committed\": \"2019-02-27T19:16:43.289Z\",\n    \"vendor\": {\n      \"id\": \"string\"\n    },\n    \"store\": {\n      \"id\": \"string\"\n    }\n  }\n]"
+								},
+								"url": {
+									"raw": "{{apiUrl}}/api/v3/PurchaseOrders",
+									"host": [
+										"{{apiUrl}}"
+									],
+									"path": [
+										"api",
+										"v3",
+										"PurchaseOrders"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"description": "Purchase Orders\nReceipts\nInvoices\nTransfers\nRequests",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Receipts",
+					"item": [
+						{
+							"name": "Get All",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{apiUrl}}/api/v3/receipts?pageNumber=1&pageSize=100&Filter=committed=true&orderBy=docNumber&Expand= items&Expand= stores&Expand= users&Expand= vendors",
+									"host": [
+										"{{apiUrl}}"
+									],
+									"path": [
+										"api",
+										"v3",
+										"receipts"
+									],
+									"query": [
+										{
+											"key": "pageNumber",
+											"value": "1"
+										},
+										{
+											"key": "pageSize",
+											"value": "100"
+										},
+										{
+											"key": "Filter",
+											"value": "committed=true"
+										},
+										{
+											"key": "orderBy",
+											"value": "docNumber",
+											"description": "[committed,docNumber,lastUpdated]"
+										},
+										{
+											"key": "Expand",
+											"value": " items"
+										},
+										{
+											"key": "Expand",
+											"value": " stores"
+										},
+										{
+											"key": "Expand",
+											"value": " users"
+										},
+										{
+											"key": "Expand",
+											"value": " vendors"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get By Id",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{apiUrl}}/api/v3/receipts/{{id}}?Expand= items&Expand= stores&Expand= users&Expand= vendors",
+									"host": [
+										"{{apiUrl}}"
+									],
+									"path": [
+										"api",
+										"v3",
+										"receipts",
+										"{{id}}"
+									],
+									"query": [
+										{
+											"key": "Expand",
+											"value": " items"
+										},
+										{
+											"key": "Expand",
+											"value": " stores"
+										},
+										{
+											"key": "Expand",
+											"value": " users"
+										},
+										{
+											"key": "Expand",
+											"value": " vendors"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"description": "Purchase Orders\nReceipts\nInvoices\nTransfers\nRequests",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Sessions",
+			"item": [
+				{
+					"name": "Get All",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/api/v3/sessions?pageNumber=1&pageSize=100",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"v3",
+								"sessions"
+							],
+							"query": [
+								{
+									"key": "pageNumber",
+									"value": "1"
+								},
+								{
+									"key": "pageSize",
+									"value": "100"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get By Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/api/v3/sessions/{{id}}",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"api",
+								"v3",
+								"sessions",
+								"{{id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Bulk",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n  {\n    \"sessionID\": \"string\",\n    \"storeID\": \"string\",\n    \"description\": \"string\",\n    \"userID\": \"string\",\n    \"device\": \"string\",\n    \"countSheetID\": \"string\",\n    \"mobileStatus\": 0,\n    \"sessionItems\": [\n      {\n        \"sessionItemID\": \"string\",\n        \"sessionID\": \"string\",\n        \"itemID\": \"string\",\n        \"count\": 0,\n        \"flagID\": \"string\",\n        \"levelID\": \"string\"\n      }\n    ]\n  }\n]"
+						},
+						"url": {
+							"raw": "{{apiUrl}}/api/v3/sessions",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"v3",
+								"sessions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Bulk",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n  {\n    \"sessionID\": \"string\",\n    \"storeID\": \"string\",\n    \"description\": \"string\",\n    \"userID\": \"string\",\n    \"device\": \"string\",\n    \"countSheetID\": \"string\",\n    \"mobileStatus\": 0,\n    \"sessionItems\": [\n      {\n        \"sessionItemID\": \"string\",\n        \"sessionID\": \"string\",\n        \"itemID\": \"string\",\n        \"count\": 0,\n        \"flagID\": \"string\",\n        \"levelID\": \"string\"\n      }\n    ]\n  }\n]"
+						},
+						"url": {
+							"raw": "{{apiUrl}}/api/v3/sessions",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"v3",
+								"sessions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete By Id",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{apiUrl}}/api/v3/sessions/{{id}}",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"v3",
+								"sessions",
+								"{{id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Stores",
+			"item": [
+				{
+					"name": "Get All",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/api/v3/stores",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"v3",
+								"stores"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Stores (By ID)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/api/v3/stores/{{storeId}}",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"api",
+								"v3",
+								"stores",
+								"{{storeId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "ThirdPartySessions",
+			"item": [
+				{
+					"name": "Get All",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{apiUrl}}/api/v3/thirdPartySessions?pageNumber=1&pageSize=100&orderBy=dateTime",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"v3",
+								"thirdPartySessions"
+							],
+							"query": [
+								{
+									"key": "pageNumber",
+									"value": "1"
+								},
+								{
+									"key": "pageSize",
+									"value": "100"
+								},
+								{
+									"key": "orderBy",
+									"value": "dateTime",
+									"description": "[code,dateTime]"
+								},
+								{
+									"key": "filter",
+									"value": "code=100",
+									"description": "[code,dateTime]",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get By Id",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{apiUrl}}/api/v3/thirdPartySessions/{{id}}",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"v3",
+								"thirdPartySessions",
+								"{{id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Bulk",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n  {\n    \"code\": \"string\",\n    \"source\": \"string\",\n    \"description\": \"string\",\n    \"dateTime\": \"2019-02-27T19:36:23.633Z\",\n    \"store\": {\n      \"id\": \"string\",\n      \"code\": \"string\",\n      \"name\": \"string\"\n    },\n    \"lines\": [\n      {\n        \"flag\": \"string\",\n        \"device\": \"string\",\n        \"dateTime\": \"2019-02-27T19:36:23.633Z\",\n        \"item\": {\n          \"id\": \"string\",\n          \"upc\": \"string\",\n          \"sku\": \"string\",\n          \"description\": \"string\",\n          \"category\": \"string\",\n          \"subCategory\": \"string\",\n          \"retail\": 0,\n          \"unit\": \"string\",\n          \"manufacturer\": {\n            \"id\": \"string\",\n            \"sku\": \"string\",\n            \"name\": \"string\",\n            \"cost\": 0\n          },\n          \"vendor\": {\n            \"id\": \"string\",\n            \"sku\": \"string\",\n            \"name\": \"string\",\n            \"cost\": 0\n          }\n        },\n        \"counted\": 0,\n        \"countedWeight\": {\n          \"value\": 0,\n          \"unit\": \"string\"\n        },\n        \"countedVolume\": {\n          \"value\": 0,\n          \"unit\": \"string\"\n        },\n        \"fullWeight\": {\n          \"value\": 0,\n          \"unit\": \"string\"\n        },\n        \"tareWeight\": {\n          \"value\": 0,\n          \"unit\": \"string\"\n        }\n      }\n    ]\n  }\n]"
+						},
+						"url": {
+							"raw": "{{URL}}/api/v3/thirdpartysessions",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"api",
+								"v3",
+								"thirdpartysessions"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Transactions",
+			"item": [
+				{
+					"name": "Get All",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{apiUrl}}/api/v3/transactions?pageNumber=1&pageSize=100",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"v3",
+								"transactions"
+							],
+							"query": [
+								{
+									"key": "pageNumber",
+									"value": "1"
+								},
+								{
+									"key": "pageSize",
+									"value": "100"
+								},
+								{
+									"key": "filter",
+									"value": "checkClosed >= 20190101",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get By ThirdPartyId",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{apiUrl}}/api/v3/transactions/{{thirdPartyId}}",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"v3",
+								"transactions",
+								"{{thirdPartyId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get By StoreId",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{apiUrl}}/api/v3/transactions/store/{{storeId}}",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"v3",
+								"transactions",
+								"store",
+								"{{storeId}}"
+							],
+							"query": [
+								{
+									"key": "storeId",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Bulk",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n  {\n    \"thirdPartyId\": \"string\",\n    \"transactionNumber\": \"string\",\n    \"checkClosed\": \"2019-02-27T19:39:26.572Z\",\n    \"employeeNumber\": \"string\",\n    \"employeeName\": \"string\",\n    \"tender\": \"string\",\n    \"registerNumber\": \"string\",\n    \"registerName\": \"string\",\n    \"reference\": \"string\",\n    \"store\": {\n      \"id\": \"string\"\n    },\n    \"lines\": [\n      {\n        \"thirdPartyLineId\": \"string\",\n        \"itemNumber\": \"string\",\n        \"sku\": \"string\",\n        \"itemDescription\": \"string\",\n        \"itemRetail\": 0,\n        \"baseRetail\": 0,\n        \"itemDiscount\": 0,\n        \"discountDescription\": \"string\",\n        \"quantity\": 0,\n        \"lineNumber\": 0,\n        \"modifier\": \"string\",\n        \"item\": {\n          \"id\": \"string\"\n        }\n      }\n    ]\n  }\n]"
+						},
+						"url": {
+							"raw": "{{apiUrl}}/api/v3/transactions",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"v3",
+								"transactions"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Vendors",
+			"item": [
+				{
+					"name": "Get All",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/api/v3/vendors?pageNumber=1&pageSize=100&orderBy=code",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"v3",
+								"vendors"
+							],
+							"query": [
+								{
+									"key": "pageNumber",
+									"value": "1"
+								},
+								{
+									"key": "pageSize",
+									"value": "100"
+								},
+								{
+									"key": "orderBy",
+									"value": "code",
+									"description": "[code,created,lastupdated]"
+								},
+								{
+									"key": "filter",
+									"value": "code=100",
+									"description": "[code,description,url,collectsTax,notes,created,lastUpdated]",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get By Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/api/v3/vendors/{{id}}",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"v3",
+								"vendors",
+								"{{id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Bulk",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n  {\n    \"code\": \"string\",\n    \"description\": \"string\",\n    \"url\": \"string\",\n    \"collectsTax\": true,\n    \"notes\": \"string\",\n    \"approved\": true,\n    \"currencyCode\": \"string\",\n    \"orderFrom\": {\n      \"contact\": \"string\",\n      \"phone\": \"string\",\n      \"fax\": \"string\",\n      \"mobile\": \"string\",\n      \"email\": \"string\",\n      \"street\": \"string\",\n      \"city\": \"string\",\n      \"state\": \"string\",\n      \"zip\": \"string\",\n      \"country\": \"string\",\n      \"other\": \"string\"\n    },\n    \"returnTo\": {\n      \"contact\": \"string\",\n      \"phone\": \"string\",\n      \"fax\": \"string\",\n      \"mobile\": \"string\",\n      \"email\": \"string\",\n      \"street\": \"string\",\n      \"city\": \"string\",\n      \"state\": \"string\",\n      \"zip\": \"string\",\n      \"country\": \"string\",\n      \"other\": \"string\"\n    },\n    \"stores\": [\n      {\n        \"id\": \"string\",\n        \"available\": true,\n        \"accountingId\": \"string\",\n        \"taxNumber\": \"string\",\n        \"terms\": \"string\",\n        \"reference\": \"string\"\n      }\n    ]\n  }\n]"
+						},
+						"url": {
+							"raw": "{{apiUrl}}/api/v3/vendors",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"v3",
+								"vendors"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Bulk",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n  {\n    \"id\": \"string\",\n    \"code\": \"string\",\n    \"description\": \"string\",\n    \"url\": \"string\",\n    \"collectsTax\": true,\n    \"notes\": \"string\",\n    \"approved\": true,\n    \"currencyCode\": \"string\",\n    \"orderFrom\": {\n      \"contact\": \"string\",\n      \"phone\": \"string\",\n      \"fax\": \"string\",\n      \"mobile\": \"string\",\n      \"email\": \"string\",\n      \"street\": \"string\",\n      \"city\": \"string\",\n      \"state\": \"string\",\n      \"zip\": \"string\",\n      \"country\": \"string\",\n      \"other\": \"string\"\n    },\n    \"returnTo\": {\n      \"contact\": \"string\",\n      \"phone\": \"string\",\n      \"fax\": \"string\",\n      \"mobile\": \"string\",\n      \"email\": \"string\",\n      \"street\": \"string\",\n      \"city\": \"string\",\n      \"state\": \"string\",\n      \"zip\": \"string\",\n      \"country\": \"string\",\n      \"other\": \"string\"\n    },\n    \"stores\": [\n      {\n        \"id\": \"string\",\n        \"available\": true,\n        \"accountingId\": \"string\",\n        \"taxNumber\": \"string\",\n        \"terms\": \"string\",\n        \"reference\": \"string\"\n      }\n    ]\n  }\n]"
+						},
+						"url": {
+							"raw": "{{apiUrl}}/api/v3/vendors",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"v3",
+								"vendors"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Bulk",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n  \"string\"\n]"
+						},
+						"url": {
+							"raw": "{{apiUrl}}/api/v3/vendors/",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"v3",
+								"vendors",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete By Id",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{apiUrl}}/api/v3/vendors/{{id}}",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"v3",
+								"vendors",
+								"{{id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "ItemAliases",
+			"item": [
+				{
+					"name": "Get Item Aliases",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/api/v3/itemaliases",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"v3",
+								"itemaliases"
+							]
+						},
+						"description": "Aliases are alternate lookup codes. Usually UPCs. "
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{currentAccessToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"const clientId = pm.collectionVariables.get('clientId');",
+					"const userName = pm.collectionVariables.get('userName');",
+					"const password = pm.collectionVariables.get('password');",
+					"const authUrl = pm.collectionVariables.get('authUrl');",
+					"",
+					"",
+					"const echoPostRequest = {",
+					"  url: authUrl+'/token',",
+					"  method: 'POST',",
+					"  header: 'Content-Type:application/json',",
+					"  body: {",
+					"    mode: 'application/json',",
+					"    raw: JSON.stringify(",
+					"        {",
+					"        \tclientId: clientId,",
+					"        \tuserName: userName,",
+					"        \tpassword:password",
+					"        })",
+					"  }",
+					"};",
+					"",
+					"var getToken = true;",
+					"",
+					"if (!pm.collectionVariables.get('currentAccessToken') || ",
+					"    !pm.collectionVariables.get('accessTokenExpiry')) {",
+					"    console.log('Token or expiry date are missing')",
+					"} else if (pm.collectionVariables.get('accessTokenExpiry') <= (new Date()).getTime()) {",
+					"    console.log('Token is expired')",
+					"} else {",
+					"    getToken = false;",
+					"    console.log('Token and expiry date are all good');",
+					"}",
+					"",
+					"if (getToken === true) {",
+					"    pm.sendRequest(echoPostRequest, function (err, res) {",
+					"    console.log(err ? err : res.json());",
+					"        if (err === null) {",
+					"            console.log('Saving the token and expiry date')",
+					"            var responseJson = res.json();",
+					"            pm.collectionVariables.set('currentAccessToken', responseJson.result.accessToken)",
+					"    ",
+					"            var expiryDate = new Date();",
+					"            expiryDate.setSeconds(expiryDate.getSeconds() + responseJson.result.expiresIn);",
+					"            pm.collectionVariables.set('accessTokenExpiry', expiryDate.getTime());",
+					"        }",
+					"    });",
+					"}"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "currentAccessToken",
+			"value": ""
+		},
+		{
+			"key": "accessTokenExpiry",
+			"value": ""
+		},
+		{
+			"key": "authUrl",
+			"value": "https://auth.yellowdogsoftware.com",
+			"type": "string"
+		},
+		{
+			"key": "apiUrl",
+			"value": "https://fetch.yellowdogsoftware.com",
+			"type": "string"
+		},
+		{
+			"key": "clientId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "userName",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
